@@ -2,12 +2,17 @@
 
 const async        = require('async');
 const EventEmitter = require('events');
-const zlib         = require('zlib');
+// We have three encoding implementations in this repository (snappy, gzip, and lz4).
+// In testing, gzip was too slow for large sessions (~2mb).
+// lz4 and snappy were about the same speed, but lz4 offered slightly better compression
+// in our testing data set.
+const LZ4          = require('./encodings/lz4.js');
 
 module.exports = class SessionCompress extends EventEmitter {
   constructor(store) {
     super();
     this.store = store;
+    this._encoding = new LZ4();
 
     // Some methods are optional, so only add them if the backing store has them.
     for (let meth of ['destroy', 'clear', 'length']) {
@@ -69,22 +74,16 @@ module.exports = class SessionCompress extends EventEmitter {
 
   compress(session, cb) {
     let uncompressed = JSON.stringify(session);
-    zlib.gzip(uncompressed, (err, compressed) => {
-      if (err) {
-        cb(err);
-        return
+    this._encoding.compress(uncompressed, (err, compressed) => {
+      if (compressed) {
+        console.log(`turned len ${uncompressed.length} to len ${compressed.length}`)
       }
-
-      // I don't know that all backing stores would handle buffers correctly so let's convert it to
-      // a string
-      compressed = compressed.toString('binary');
-      console.log(`turned len ${uncompressed.length} to len ${compressed.length}`)
-      cb(null, compressed);
-    })
+      cb(err, compressed);
+    });
   }
 
-  decompress(compressed, cb) {
-    zlib.gunzip(Buffer.from(compressed, 'binary'), (err, uncompressed) => {
+  decompress(session, cb) {
+    this._encoding.decompress(session, (err, uncompressed) => {
       if (err) {
         cb(err);
         return
