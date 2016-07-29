@@ -10,32 +10,32 @@ describe('connect session compress', () => {
   });
 
   it("has methods that the backing store has", () => {
-    let csc = new ConnectSessionCompress({all: "doesn't matter"});
+    const csc = new ConnectSessionCompress({all: "doesn't matter"});
     assert(csc.all);
   });
 
   it("doesn't have methods that the backing store doesn't", () => {
-    let csc = new ConnectSessionCompress({});
+    const csc = new ConnectSessionCompress({});
     assert(!csc.all);
   });
 
   it("passes through basic methods", (done) => {
-    let destroy = sinon.stub();
+    const destroy = sinon.stub();
     destroy.withArgs("sid").yields(null);
 
-    let csc = new ConnectSessionCompress({destroy: destroy});
+    const csc = new ConnectSessionCompress({destroy: destroy});
 
     csc.destroy("sid", done);
   });
 
   describe("set", () => {
     it("compresses sessions", (done) => {
-      let set = sinon.stub();
+      const set = sinon.stub();
       set.withArgs("sid", "compressed").yields(null);
-      let compress = sinon.stub();
+      const compress = sinon.stub();
       compress.withArgs("uncompressed").yields(null, "compressed");
 
-      let csc = new ConnectSessionCompress({set: set});
+      const csc = new ConnectSessionCompress({set: set});
       csc.compress = compress;
 
       csc.set("sid", "uncompressed", done);
@@ -44,12 +44,12 @@ describe('connect session compress', () => {
 
   describe("get", () => {
     it("uncompresses sessions that it gets", (done) => {
-      let get = sinon.stub();
+      const get = sinon.stub();
       get.withArgs("sid").yields(null, "compressed");
-      let decompress = sinon.stub();
+      const decompress = sinon.stub();
       decompress.withArgs("compressed").yields(null, "uncompressed");
 
-      let csc = new ConnectSessionCompress({get: get});
+      const csc = new ConnectSessionCompress({get: get});
       csc.decompress = decompress;
 
       csc.get("sid", done);
@@ -58,12 +58,12 @@ describe('connect session compress', () => {
 
   describe("touch", () => {
     it("compresses sessions", (done) => {
-      let touch = sinon.stub();
+      const touch = sinon.stub();
       touch.withArgs("sid", "compressed").yields(null);
-      let compress = sinon.stub();
+      const compress = sinon.stub();
       compress.withArgs("uncompressed").yields(null, "compressed");
 
-      let csc = new ConnectSessionCompress({touch: touch});
+      const csc = new ConnectSessionCompress({touch: touch});
       csc.compress = compress;
 
       csc.touch("sid", "uncompressed", done);
@@ -72,13 +72,13 @@ describe('connect session compress', () => {
 
   describe("all", () => {
     it("uncompresses all the sessions", (done) => {
-      let all = sinon.stub();
+      const all = sinon.stub();
       all.yields(null, ["uncompressed1", "uncompressed2"]);
-      let decompress = sinon.stub();
+      const decompress = sinon.stub();
       decompress.withArgs("uncompressed1").yields(null, "compressed1");
       decompress.withArgs("uncompressed2").yields(null, "compressed2");
 
-      let csc = new ConnectSessionCompress({all: all});
+      const csc = new ConnectSessionCompress({all: all});
       csc.decompress = decompress;
 
       csc.all((err, sessions) => {
@@ -92,7 +92,7 @@ describe('connect session compress', () => {
 
   describe("compress", () => {
     it("compresses rich data", (done) => {
-      let csc = new ConnectSessionCompress({});
+      const csc = new ConnectSessionCompress({});
       csc.compress({key: "val"}, (err, compressed) => {
         assert.ifError(err);
         assert.equal(compressed.length, 33);
@@ -104,7 +104,7 @@ describe('connect session compress', () => {
 
   describe("decompress", () => {
     it("decompresses rich data", (done) => {
-      let csc = new ConnectSessionCompress({});
+      const csc = new ConnectSessionCompress({});
       csc.compress({key: "val"}, (err, compressed) => {
         assert.ifError(err);
         csc.decompress(compressed, (err, original) => {

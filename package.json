@@ -11,7 +11,7 @@
     "url": "git+https://github.com/Clever/connect-session-compress.git"
   },
   "author": "azylman",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Clever/connect-session-compress/issues"
   },

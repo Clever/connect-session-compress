@@ -73,7 +73,14 @@ module.exports = class SessionCompress extends EventEmitter {
   }
 
   compress(session, cb) {
-    let uncompressed = JSON.stringify(session);
+    let uncompressed;
+    try {
+      uncompressed = JSON.stringify(session);
+    } catch (err) {
+      cb(err);
+      return
+    }
+
     this._encoding.compress(uncompressed, (err, compressed) => {
       if (compressed) {
         console.log(`turned len ${uncompressed.length} to len ${compressed.length}`)
@@ -89,7 +96,11 @@ module.exports = class SessionCompress extends EventEmitter {
         return
       }
 
-      cb(null, JSON.parse(uncompressed));
+      try {
+        cb(null, JSON.parse(uncompressed));
+      } catch (err) {
+        cb(err);
+      }
     });
   }
 }
