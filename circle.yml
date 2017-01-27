@@ -7,7 +7,7 @@ machine:
   - docker
 dependencies:
   override:
-  - npm install
+  - CC=gcc-4.8 CXX=g++-4.8 npm install
 test:
   override:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
