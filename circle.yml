@@ -7,12 +7,12 @@ machine:
   - docker
 dependencies:
   override:
-  - CC=gcc-4.8 CXX=g++-4.8 npm install
-test:
-  override:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get -y update
   - sudo apt-get -y install gcc-4.8 g++-4.8
+  - CC=gcc-4.8 CXX=g++-4.8 npm install
+test:
+  override:
   - make test
   post:
   - $HOME/ci-scripts/circleci/report-card $RC_DOCKER_USER $RC_DOCKER_PASS "$RC_DOCKER_EMAIL" $RC_GITHUB_TOKEN
