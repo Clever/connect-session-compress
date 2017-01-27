@@ -1,0 +1,25 @@
+machine:
+  post:
+  - cd $HOME && git clone --depth 1 -v git@github.com:clever/ci-scripts.git && cd ci-scripts && git show --oneline -s
+  node:
+    version: 6.3.1
+  services:
+  - docker
+dependencies:
+  override:
+  # Update gcc because lz4 requires a newer version
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get -y update
+  - sudo apt-get -y install gcc-4.8 g++-4.8
+  - CC=gcc-4.8 CXX=g++-4.8 npm install
+test:
+  override:
+  - make test
+  post:
+  - $HOME/ci-scripts/circleci/report-card $RC_DOCKER_USER $RC_DOCKER_PASS "$RC_DOCKER_EMAIL" $RC_GITHUB_TOKEN
+deployment:
+  all:
+    branch: master
+    owner: Clever
+    commands:
+    - $HOME/ci-scripts/circleci/npm-publish $NPM_TOKEN .
