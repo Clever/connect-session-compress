@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: connect-session-compress
+  description: connect session store that compresses the session data. compatible with any backing store (redis, dynamo, etc.)
+  owner: unknown
+spec:
+  type: unknown
+  lifecycle: production
+  owner: unknown
+  system: Clever
